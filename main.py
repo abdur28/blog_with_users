@@ -11,12 +11,8 @@ from functools import wraps
 from flask import abort
 from flask_gravatar import Gravatar
 import os
-import re
 
-uri = os.environ.get("DATABASE_URL")  # or other relevant config var
-if uri and uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1)
-# rest of connection code using the connection string `uri`
+url = os.environ.get('DATABASE_URL').replace("postgres://", "postgresql://", 1)
 
 def admin_only(f):
     @wraps(f)
@@ -36,7 +32,7 @@ ckeditor = CKEditor(app)
 Bootstrap(app)
 
 ##CONNECT TO DB
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
+app.config['SQLALCHEMY_DATABASE_URI'] = url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -93,9 +89,7 @@ class Comment(db.Model):
     parent_post = relationship("BlogPost", back_populates="comments")
     text = db.Column(db.Text, nullable=False)
 
-
-# db.drop_all()
-# db.create_all()
+db.create_all()
 
 login_manager = LoginManager()
 login_manager.init_app(app)
